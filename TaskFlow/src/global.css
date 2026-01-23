@@ -1,0 +1,54 @@
+@import url("https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,100..900;1,100..900&display=swap");
+@import "tailwindcss";
+
+@theme {
+	/* Custom font for app name */
+	--font-exo: "Exo 2", sans-serif;
+
+	/* Solid background colors */
+	--color-lightbg:	#D6D3D1;
+	--color-nightbg:	#0A0A0A;
+
+	/* Light mode theme colors */
+	--color-green-light:	#2CBC6A;
+	--color-yellow-light:	#E6C942;
+	--color-purple-light:	#B070FF;
+	--color-magenta-light:	#FF5CBF;
+	--color-border-night:	#555555;
+
+	/* Night mode theme colors */
+	--color-green-night:	#1FA75A;
+	--color-yellow-night:	#C3AC38;
+	--color-purple-night:	#8A5CDC;
+	--color-magenta-night:	#E44FAE;
+	--color-border-light:	#C8C8C8;
+
+	/* UI constant colors */
+	--color-green-ui:	#3CD97F;
+	--color-yellow-ui:	#DDBB33;
+	--color-purple-ui:	#9A4DFF;
+	--color-magenta-ui:	#FF4FB6;
+	--color-red-ui:		#FF5A5A;
+
+	/* Hover state colors */
+	--color-green-hover:	#33C774;
+	--color-yellow-hover:	#D1B330;
+	--color-purple-hover:	#A356FF;
+	--color-magenta-hover:	#FF46B0;
+	--color-red-hover:		#FF4242;
+
+	/* Active state colors */
+	--color-green-active:	#2AAF65;
+	--color-yellow-active:	#BFA22A;
+	--color-purple-active:	#8F47EB;
+	--color-magenta-active:	#E83FA4;
+	--color-red-active:		#E53939;
+}
+
+@layer components {
+	.background {
+		@apply flex flex-col min-h-screen  bg-linear-to-br
+			from-lightbg via-neutral-400 to-nightbg
+			dark:from-nightbg dark:via-neutral-900 dark:to-lightbg;
+	}
+}

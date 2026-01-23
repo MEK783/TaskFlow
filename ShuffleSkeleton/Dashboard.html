@@ -1,0 +1,133 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="./styling.css" rel="stylesheet">
+</head>
+<body>
+  <section class="min-h-screen bg-coolGray-100 dashboard-section">
+  <nav class="bg-white shadow-sm border-b border-coolGray-200 px-4 py-4">
+    <div class="flex justify-between items-center">
+      <a class="block" href="#">
+        <img class="h-8" src="https://static.shuffle.dev/uploads/files/80/804ed5dbf59fb3825b4feb004610365f5f07b3a8/logos/logo-b8524cb45e3e8150de537736df5c329e.png" alt="TaskFlow"/>
+      </a>
+      <button class="inline-block py-2 px-4 text-sm leading-5 text-coolGray-500 hover:text-coolGray-900 bg-transparent font-medium rounded-md logout-btn">Log Out</button>
+    </div>
+  </nav>
+  <div class="p-4 md:p-6">
+    <div class="mb-6 md:hidden">
+      <div class="flex bg-white rounded-lg shadow-sm border border-coolGray-200 p-1">
+        <button class="flex-1 py-2 px-4 text-sm font-medium rounded-md tab-mobile-btn active bg-green-500 text-white" data-tab="waiting">Waiting</button>
+        <button class="flex-1 py-2 px-4 text-sm font-medium rounded-md tab-mobile-btn text-coolGray-500" data-tab="inprogress">In Progress</button>
+        <button class="flex-1 py-2 px-4 text-sm font-medium rounded-md tab-mobile-btn text-coolGray-500" data-tab="finished">Finished</button>
+      </div>
+    </div>
+    <div class="flex flex-col md:flex-row gap-4 md:gap-6">
+      <div class="flex-1 bg-white rounded-lg shadow-sm border border-coolGray-200 task-column waiting-column md:block" data-status="waiting">
+        <div class="flex justify-between items-center p-4 border-b border-coolGray-200 bg-amber-50 rounded-t-lg">
+          <h2 class="text-lg font-bold text-coolGray-900 flex items-center">
+            <svg class="w-5 h-5 mr-2 text-amber-500" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <span>Waiting</span>
+          </h2>
+          <button class="w-8 h-8 flex items-center justify-center bg-amber-500 hover:bg-amber-600 text-white rounded-md add-task-btn">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+          </button>
+        </div>
+        <div class="p-4 task-list min-h-64 max-h-screen overflow-y-auto" data-status="waiting"></div>
+      </div>
+      <div class="flex-1 bg-white rounded-lg shadow-sm border border-coolGray-200 task-column inprogress-column hidden md:block" data-status="inprogress">
+        <div class="flex justify-between items-center p-4 border-b border-coolGray-200 bg-blue-50 rounded-t-lg">
+          <h2 class="text-lg font-bold text-coolGray-900 flex items-center">
+            <svg class="w-5 h-5 mr-2 text-blue-500" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            </svg>
+            <span>In Progress</span>
+          </h2>
+        </div>
+        <div class="p-4 task-list min-h-64 max-h-screen overflow-y-auto" data-status="inprogress">
+          <div class="task-item mb-3 rounded-lg border-2 border-blue-300 bg-blue-50 overflow-hidden cursor-move" draggable="true" data-task-id="1">
+            <div class="task-header flex items-center justify-between p-3 bg-blue-100 cursor-pointer">
+              <div class="flex items-center gap-2 flex-1 min-w-0">
+                <svg class="collapse-icon w-4 h-4 text-coolGray-500 transition-transform " fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+                <span class="task-title text-sm font-medium text-coolGray-900 truncate">asdf</span>
+              </div>
+              <div class="flex items-center gap-1">
+                <button class="edit-task-btn p-1 text-coolGray-500 hover:text-coolGray-700">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                  </svg>
+                </button>
+                <button class="move-left-btn p-1 text-coolGray-500 hover:text-coolGray-700 ">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                  </svg>
+                </button>
+                <button class="move-right-btn p-1 text-coolGray-500 hover:text-coolGray-700 ">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                  </svg>
+                </button>
+                <button class="delete-task-btn p-1 text-red-500 hover:text-red-700">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <div class="task-body p-3 hidden">
+              <p class="task-description text-sm text-coolGray-600 mb-3">sss</p>
+              <div class="subtasks-section border-t border-coolGray-200 pt-3 mt-3">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-xs font-medium text-coolGray-500 uppercase">Sub-tasks</span>
+                  <button class="add-subtask-btn text-xs text-green-500 hover:text-green-600 font-medium">+ Add</button>
+                </div>
+                <div class="subtasks-list">
+                  <div class="subtask-item flex items-center gap-2 p-2 rounded border border-amber-300 bg-amber-50 mb-2" data-subtask-idx="0">
+                    <select class="subtask-status-select text-xs py-1 px-2 rounded border border-coolGray-300">
+                      <option value="waiting" selected="">Waiting</option>
+                      <option value="inprogress">In Progress</option>
+                      <option value="finished">Finished</option>
+                    </select>
+                    <span class="flex-1 text-sm text-coolGray-700">ss</span>
+                    <button class="delete-subtask-btn text-red-500 hover:text-red-700">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+                <div class="add-subtask-form hidden">
+                  <input type="text" class="subtask-title-input w-full py-2 px-3 text-sm border border-coolGray-300 rounded mb-2" placeholder="Sub-task title"/>
+                  <div class="flex gap-2">
+                    <button class="confirm-subtask-btn py-1 px-3 text-xs text-white bg-green-500 hover:bg-green-600 rounded">Add</button>
+                    <button class="cancel-subtask-btn py-1 px-3 text-xs text-coolGray-500 bg-coolGray-200 hover:bg-coolGray-300 rounded">Cancel</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="flex-1 bg-white rounded-lg shadow-sm border border-coolGray-200 task-column finished-column hidden md:block" data-status="finished">
+        <div class="flex justify-between items-center p-4 border-b border-coolGray-200 bg-green-50 rounded-t-lg">
+          <h2 class="text-lg font-bold text-coolGray-900 flex items-center">
+            <svg class="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <span>Finished</span>
+          </h2>
+        </div>
+        <div class="p-4 task-list min-h-64 max-h-screen overflow-y-auto" data-status="finished"></div>
+      </div>
+    </div>
+  </div>
+</section>
+</body>
+</html>

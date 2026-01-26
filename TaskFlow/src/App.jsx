@@ -1,20 +1,24 @@
-import { useState } from 'react'
 import { AuthProvider } from './state/AuthContext.jsx';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import Footer from './components/Footer.jsx'
-import LoginScreen from './components/LoginScreen.jsx'
+import LoginScreen from './pages/LoginScreen.jsx'
 import Header from './components/Header.jsx';
+import Dashboard from '../../mek-tasks/src/pages/Dashboard.jsx';
+import RegisterScreen from './pages/RegisterScreen.jsx';
+import RequireAuth from './components/RequireAuth.jsx';
 
 function App() {
-  const [loggedIn, setLoggedIn] = useState(false)
-
-  function onLogin() {
-    setLoggedIn(prevState => !prevState);
-  }
 
   return (
     <AuthProvider>
-      <Header onClick={onLogin} userState={loggedIn} />
-      <LoginScreen onClick={onLogin} userState={loggedIn}/>
+      <Header/>
+      <Routes>
+        <Route path="/" element={<Navigate to="/app" />} />
+        <Route path="/app" element={<RequireAuth><Dashboard /></RequireAuth>} />
+        <Route path="/login" element={<LoginScreen />} />
+        <Route path="/register" element={<RegisterScreen />} />
+        <Route path="*" element={<Navigate to="/app" />} />
+      </Routes>
       <Footer />
     </AuthProvider>
   )

@@ -17,10 +17,10 @@ export default function ThemeToggle(){
 
   return (
     <>
-    <span className="inset-0 items-center justify-center text-mek-green">{isDark ? <MdOutlineDarkMode size={24} /> : <MdOutlineLightMode size={24} />}</span>
+    <span className="inset-0 items-center justify-center text-green-ui">{isDark ? <MdOutlineDarkMode size={24} /> : <MdOutlineLightMode size={24} />}</span>
     <button
       onClick={() => setTheme(previous => (previous === "light" ? "dark" : "light"))}
-      className="relative w-14 h-8 rounded-full transition-colors duration-200 dark:bg-mek-green bg-meklight-mgreen border border-meklight-border dark:border-mek-border"
+      className="relative w-14 h-8 rounded-full transition-colors duration-200 dark:bg-green-night bg-green-ui border border-border-light dark:border-border-night"
       aria-label="Toggle theme"
       role="switch"
       aria-checked={isDark}

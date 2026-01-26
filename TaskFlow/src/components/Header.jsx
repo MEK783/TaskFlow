@@ -6,7 +6,7 @@ import AppTitle from "./AppTitle.jsx";
 import ThemeToggle from "./ThemeToggle.jsx";
 
 export default function Header() {
-    const {user, logout, login } = useAuth();
+    const {user, logout } = useAuth();
 
     return (
         <header className="w-full flex flex-row items-center justify-between">
@@ -26,15 +26,21 @@ export default function Header() {
             <div className="flex items-center gap-3 mr-4 -mt-11">
                 <ThemeToggle />
                 {user && (
-                <button className="rounded-full p-0.5 items-center justify-center text-sm font-medium bg-meklight-magenta dark:bg-mek-magenta/40 text-meklight-mmagenta dark:text-mek-magenta border-2 border-mek-mmagenta dark:border-magenta" aria-label="Invites">
+                <button className="
+                    rounded-full p-0.5 items-center justify-center text-sm font-medium
+                    bg-magenta-light/35 dark:bg-magenta-night/35
+                    text-magenta-night dark:text-magenta-night
+                    border-2 border-magenta-ui
+                    hover:bg-magenta-ui/45 hover:border-magenta-hover
+                    dark:hover:bg-magenta-ui/60" aria-label="Invites">
                 <LiaUserPlusSolid size={30} />
                 </button>
                 )}
-                <button className="rounded-full p-0.5 items-center justify-center text-sm font-medium bg-blue-500 hover:bg-blue-700 text-neutral-200 border-meklight-border border-2 dark:border-mek-border" aria-label="Help">
+                <button className="rounded-full p-0.5 items-center justify-center text-sm font-medium bg-blue-500 hover:bg-blue-700 text-neutral-200 border-border-light border-2 dark:border-border-night" aria-label="Help">
                 <MdHelpOutline size={32}/>
                 </button>
                 {user && (<button
-                className={"inline-flex items-center gap-2 rounded-lg px-4 py-1.5 text-base font-semibold text-white bg-red-500 border-meklight-border dark:border-mek-border border-2 hover:bg-red-700"}  onClick={logout}
+                className="inline-flex items-center gap-2 rounded-lg px-4 py-1.5 text-base font-semibold text-white bg-red-ui border-border-light dark:border-border-night border-2 hover:bg-red-hover" title="Log out" onClick={logout}
                 ><MdLogout />Log out</button>)}
             </div>
         </header>

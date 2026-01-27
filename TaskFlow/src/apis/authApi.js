@@ -1,4 +1,6 @@
-export const LS_USERS = "auth_users_v1";
+import { USERNAME_RGX, AUTH_ERRORS } from "../utils/sharedVariables";
+
+const LS_USERS = "auth_users_v1";
 const LS_INVITES = "auth_invites_v1";
 
 function load(key, fallback) {
@@ -14,7 +16,6 @@ function genId() { return `u_${Math.random().toString(36).slice(2, 10)}`; }
 function genCode() { return Math.random().toString(36).toUpperCase().slice(2, 10); } // 8 chars
 
 function normalizeUsername(u) { return u.trim().toLowerCase(); }
-const USERNAME_RGX = /^[a-zA-Z0-9_.-]{3,32}$/;
 
 export const authApi = {
   // ---- INVITES ----
@@ -47,23 +48,23 @@ export const authApi = {
   // ---- REGISTRATION ----
   async register( username, password, code ) {
     console.debug("[authApi.register] invites store", load(LS_INVITES, []));
-    const uname = (username ?? "").trim();
+    const uname = String(username ?? "").trim();
     if (!USERNAME_RGX.test(uname)) {
-      return Promise.reject({ code: "invalid_username", message: "Username must be 3–32 chars: letters, numbers, _.-" });
+      return Promise.reject({ code: "AUTH_ERRORS.INVALID_USER", message: "Username must be 3–32 chars: letters, numbers, _.-" });
     }
     if (!password || password.length < 6) {
-      return Promise.reject({ code: "weak_password", message: "Password must be at least 6 characters (demo rule)." });
+      return Promise.reject({ code: "AUTH_ERRORS.WEAK_PASS", message: "Password must be at least 6 characters (demo rule)." });
     }
     const invites = load(LS_INVITES, []);
     const invite = invites.find(i => i.code === code.trim().toUpperCase());
-    if (!invite) throw { code: "invite_not_found", message: "Invite code not found." };
-    if (invite.usedAt) throw { code: "invite_used", message: "Invite code already used." };
-    if (invite.expiresAt && invite.expiresAt < now()) throw { code: "invite_expired", message: "Invite code expired." };
+    if (!invite) throw { code: "AUTH_ERRORS.INVALID_INVITE", message: "Invite code not found." };
+    if (invite.usedAt) throw { code: "AUTH_ERRORS.USED_INVITE", message: "Invite code already used." };
+    if (invite.expiresAt && invite.expiresAt < now()) throw { code: "AUTH_ERRORS.EXPIRED", message: "Invite code expired." };
 
     const users = load(LS_USERS, []);
     const unameNorm = normalizeUsername(uname);
     if (users.some(u => u.usernameNorm === unameNorm)) {
-      throw { code: "username_taken", message: "Username is already taken." };
+      throw { code: "AUTH_ERRORS.TAKEN", message: "Username is already taken." };
     }
 
     // DEMO ONLY: store cleartext password; replace with server-side hashing later.
@@ -91,10 +92,10 @@ export const authApi = {
     console.debug("[authApi.login] incoming", {username, password});
     console.debug("[authApi.login] users store", load(LS_USERS, []));
     const users = load(LS_USERS, []);
-    const unameNorm = normalizeUsername(username ?? "");
+    const unameNorm = normalizeUsername(String(username ?? ""));
     const record = users.find(u => u.usernameNorm === unameNorm);
     if (!record || record.password !== password) {
-      throw { code: "invalid_credentials", message: "Invalid username or password." };
+      throw { code: "AUTH_ERRORS.BAD_LOGIN", message: "Invalid username or password." };
     }
     const { password: _omit, ...user } = record;
     return { user, token: `demo.${user.id}.${Date.now()}` };

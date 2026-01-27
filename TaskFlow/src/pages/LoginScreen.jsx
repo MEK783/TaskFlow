@@ -1,19 +1,71 @@
 import { useState } from "react";
 import { useAuth } from "../state/AuthContext.jsx";
+import { useToast } from "../state/ToastContext.jsx";
+import { validateLogin, getAuthApiErrors } from "../utils/validators.js";
 import { Link, useNavigate } from 'react-router-dom';
 import AppTitle from "../components/AppTitle.jsx";
 
 export default function LoginScreen() {
-    const { login } = useAuth();
+    const { login, loading } = useAuth();
+    const { error: toastError, success } = useToast();
     const navigate = useNavigate();
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [remember, setRemember] = useState(false);
+    const [errors, setErrors] = useState({});
 
-    function handleSubmit(ev) {
+    function setFieldError(fieldName, message) {
+        setErrors((err) => ({ ...err, [fieldName]: message}));
+    }
+    
+    function clearFieldError(fieldName) {
+        setErrors((err) => ({ ...err, [fieldName]: undefined}));
+    }
+
+    function handleBlur(ev) {
+        const name = ev.target.id;
+        const draft = {username, password, invitation};
+        const result = validateRegistration(draft);
+
+        if (result[name]) {
+            setFieldError(name, result[name]);
+        }
+        else {
+            clearFieldError(name);
+        }
+    }
+
+    async function handleSubmit(ev) {
         ev.preventDefault();
-        login(username, password, remember);
-        navigate('/app');
+        const user = {username, password, remember};
+
+        const clientErrors = validateLogin(user);
+        if (Object.keys(clientErrors).length) {
+            setErrors(clientErrors);
+
+            const first = Object.keys(clientErrors)[0];
+            document.querySelector(`[name="${first}"]`)?.focus();
+            return;
+        }
+
+        try {
+            await login(user);
+            success("Credentials validated.", "Login successful");
+            navigate('/app');
+        } catch (error) {
+            const {errors, message} = getAuthApiErrors(error);
+            if (Object.keys(errors).length) {
+                setErrors(errors);
+                toastError(message);
+
+                const first = Object.keys(errors)[0];
+                document.querySelector(`[name="${first}"]`)?.focus();
+            }
+        }
+    }
+
+    function className(key) {
+        return `authInput ${errors[key] ? "authInput--error" : ""}`;
     }
 
     return (
@@ -29,14 +81,30 @@ export default function LoginScreen() {
                 </div>
                 <form action="#" method="post" onSubmit={handleSubmit}>
                     <div className="mb-2">
-                    <label className="block mb-2 font-medium" htmlFor="username">Username</label>
-                    <input className="authInput"
-                        type="text" id="username" placeholder="Enter your username" value={username} onChange={(ev) => setUsername(ev.target.value)}/>
+                        <label className="block mb-2 font-medium" htmlFor="username">Username</label>
+                        <input
+                            id="username"
+                            value={username}
+                            type="text"
+                            placeholder="Enter your username"
+                            autoComplete="off"
+                            className={className("username")}
+                            onBlur={handleBlur}
+                            onChange={(ev) => setUsername(ev.target.value)}  />
+                        {errors.username && <div className="validateHelp">{errors.username}</div>}
                     </div>
                     <div className="mb-3">
-                    <label className="block mb-2 font-medium" htmlFor="password">Password</label>
-                    <input className="authInput" autoComplete="off"
-                        type="password" id="password" placeholder="Enter your password" value={password} onChange={(ev) => setPassword(ev.target.value)}/>
+                        <label className="block mb-2 font-medium" htmlFor="password">Password</label>
+                        <input
+                            id="password"
+                            value={password}
+                            type="password"
+                            placeholder="Enter your password"
+                            autoComplete="off"
+                            className={className("password")}
+                            onBlur={handleBlur}
+                            onChange={(ev) => setPassword(ev.target.value)}/>
+                        {errors.password && <div className="validateHelp">{errors.password}</div>}
                     </div>
                     <div className="mb-8 flex items-center gap-2">
                         <input className="
@@ -47,11 +115,7 @@ export default function LoginScreen() {
                         type="checkbox" id="remember" checked={remember} onChange={(ev) => setRemember(ev.target.checked)} />
                         <label className="block font-medium text-grey-night" htmlFor="remember">Remember me?</label>
                     </div>
-                    <button className="
-                        inline-block py-3 px-7 w-full text-lg leading-7 font-medium text-center
-                        text-green-50 bg-green-ui hover:bg-green-hover
-                        focus:ring-2 focus:ring-offset-green-active focus:ring-opacity-50
-                        border border-transparent rounded-md shadow-sm" type="submit" >Log In</button>
+                    <button className="greenButton" type="submit" disabled={loading} >{loading ? "Logging In..." : "Log In"}</button>
                 </form>
                 <div className="mt-6 text-center">
                     <p>

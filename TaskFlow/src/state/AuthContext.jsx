@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, useRef, useMemo } from "react";
-import { authApi, LS_USERS } from "./AuthApi";
+import { authApi } from "../apis/authApi";
 
 const AuthContext = createContext(null);
 
@@ -47,7 +47,7 @@ export function AuthProvider({ children }) {
   }
 
   // Login
-  async function login(username = "DemoUser", password = "demo", rememberMe = false) {
+  async function login({username = "DemoUser", password = "demo", rememberMe = false}) {
     console.debug("[AuthContext] login()", {username, password});
     setLoading(true);
     setError(null);
@@ -85,12 +85,12 @@ export function AuthProvider({ children }) {
   };
 
   // New user registration
-  async function register(username, password, inviteCode, rememberMe = false){
-    console.debug("[AuthContext] register()", {username, password, inviteCode});
+  async function register({username, password, invitation, rememberMe = false}){
+    console.debug("[AuthContext] register()", {username, password, invitation});
     setLoading(true);
     setError(null);
     try {
-      const {user, token} = await authApi.register(username, password, inviteCode);
+      const {user, token} = await authApi.register(username, password, invitation);
       setRemember(rememberMe);
       setUser(user);
       const storage = currentStorage(rememberMe);

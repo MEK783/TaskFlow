@@ -96,4 +96,18 @@
 	.validateHelp {
 		@apply mt-1 text-xs text-red-ui text-right
 	}
+
+	.greenButton {
+		@apply	inline-block py-3 px-7 w-full text-lg leading-7 font-medium text-center
+				text-green-50 bg-green-ui 
+				border border-transparent rounded-md shadow-sm
+	}
+
+	.greenButton:hover {
+		@apply bg-green-hover
+	}
+
+	.greenButton:focus {
+		@apply outline-none ring-2 ring-offset-green-active border-none
+	}
 }

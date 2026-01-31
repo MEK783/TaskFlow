@@ -54,6 +54,9 @@ function ToastItem({toast, onClose, offset}) {
         case TOAST_TYPE.OK:
             palette = "bg-green-light dark:bg-green-night text-white border-green-ui";
             break;
+        case TOAST_TYPE.INFO:
+            palette = "bg-blue-500 text-white border-blue-700";
+            break;
         default:
             palette = "bg-lightbg dark:bg-nightbg greyText border-border-light dark:border-border-night";
             break;

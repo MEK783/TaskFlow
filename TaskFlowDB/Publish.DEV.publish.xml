@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <TargetDatabaseName>TaskFlowDB</TargetDatabaseName>
+    <TargetConnectionString>Data Source=localhost;Initial Catalog=master;Integrated Security=True;Pooling=False;Connect Timeout=30;Encrypt=True;Trust Server Certificate=True;Application Name=vscode-mssql-GeneralConnection-languageService;Application Intent=ReadWrite;Command Timeout=30</TargetConnectionString>
+    <AllowIncompatiblePlatform>True</AllowIncompatiblePlatform>
+    <DropPermissionsNotInSource>True</DropPermissionsNotInSource>
+    <DropObjectsNotInSource>True</DropObjectsNotInSource>
+    <DropRoleMembersNotInSource>True</DropRoleMembersNotInSource>
+    <GenerateSmartDefaults>True</GenerateSmartDefaults>
+    <IgnoreKeywordCasing>False</IgnoreKeywordCasing>
+    <IgnoreSemicolonBetweenStatements>False</IgnoreSemicolonBetweenStatements>
+    <AllowDropBlockingAssemblies>True</AllowDropBlockingAssemblies>
+    <DoNotEvaluateSqlCmdVariables>False</DoNotEvaluateSqlCmdVariables>
+    <ProfileVersionNumber>1</ProfileVersionNumber>
+  </PropertyGroup>
+  <ItemGroup>
+    <SqlCmdVariable Include="AdminPasswordHash">
+      <Value>$argon2id$v=19$m=65536,t=4,p=16$hwm6+XvFZpUjWoT//5oZvQ$lijNw1wCcIUEYEprFxMh/Dfrel0xebeDzS2OAhpE2gI</Value>
+    </SqlCmdVariable>
+    <SqlCmdVariable Include="AdminUser">
+      <Value>firstuser</Value>
+    </SqlCmdVariable>
+    <SqlCmdVariable Include="DatabaseName">
+      <Value>TaskFlowDB</Value>
+    </SqlCmdVariable>
+  </ItemGroup>
+</Project>

@@ -2,10 +2,9 @@
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <TargetDatabaseName>TaskFlowDB</TargetDatabaseName>
-    <TargetConnectionString>Data Source=localhost;Initial Catalog=master;Integrated Security=True;Pooling=False;Connect Timeout=30;Encrypt=True;Trust Server Certificate=True;Application Name=vscode-mssql-GeneralConnection-languageService;Application Intent=ReadWrite;Command Timeout=30</TargetConnectionString>
+    <TargetConnectionString>Data Source=localhost;Initial Catalog=master;Integrated Security=True;Pooling=False;Connect Timeout=30;Encrypt=True;Trust Server Certificate=True;Application Name=vscode-mssql-GeneralConnection-languageService;Connect Retry Count=1;Connect Retry Interval=10;Command Timeout=30</TargetConnectionString>
     <AllowIncompatiblePlatform>True</AllowIncompatiblePlatform>
     <DropPermissionsNotInSource>True</DropPermissionsNotInSource>
-    <DropObjectsNotInSource>True</DropObjectsNotInSource>
     <DropRoleMembersNotInSource>True</DropRoleMembersNotInSource>
     <GenerateSmartDefaults>True</GenerateSmartDefaults>
     <IgnoreKeywordCasing>False</IgnoreKeywordCasing>

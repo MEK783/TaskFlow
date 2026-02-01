@@ -74,7 +74,9 @@
     <PreDeploy Include="Scripts\DatabaseChecks.sql" />
   </ItemGroup>
   <ItemGroup>
-    <PostDeploy Include="Scripts\CreateFirstUser.sql" />
+    <PostDeploy Include="Scripts\PostDeploymentCollection.sql" />
+    <None Include="Scripts\CreateFirstUser.sql" />
+    <None Include="Scripts\PopulateTaskStatus.sql" />
   </ItemGroup>
   <ItemGroup>
     <SqlCmdVariable Include="AdminPasswordHash">

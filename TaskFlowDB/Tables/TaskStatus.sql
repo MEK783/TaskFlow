@@ -7,6 +7,13 @@ CREATE TABLE [dbo].[TaskStatus]
   ReactIcon NVARCHAR(50) NOT NULL CONSTRAINT DF_TaskStatus_ReactIcon DEFAULT (''),
   ClosingStatus BIT NOT NULL CONSTRAINT DF_TaskStatus_ClosingStatus DEFAULT (0),
   CONSTRAINT PK_TaskStatus PRIMARY KEY (Id),
-  CONSTRAINT CK_TaskStatus_ReactIcon CHECK (LEN(ReactIcon) = 0 OR REGEXP_LIKE(ReactIcon, '^[a-z]{2}/[A-Za-z0-9]+$'))
+  CONSTRAINT CK_TaskStatus_ReactIcon CHECK (
+    LEN(ReactIcon) = 0
+    OR (
+      ReactIcon COLLATE Latin1_General_100_CS_AS LIKE '[a-z][a-z]/%'
+      AND LEN(ReactIcon) > 3
+      AND SUBSTRING(ReactIcon, 4, LEN(ReactIcon) - 3) NOT LIKE '%[^A-Za-z0-9]%'
+    )
+  )
 )
 GO

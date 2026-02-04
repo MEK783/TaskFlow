@@ -27,39 +27,29 @@ jobs:
         id: find
         run: |
           echo "##[group]Searching for dacpac"
-          $dacpac = (Get-ChildItem -Path TaskFlowDB -Filter *.dacpac -Recurse | Where-Object { $_.Name -like 'TaskFlowDB*.dacpac' } | Select-Object -First 1).FullName
-          if (-not $dacpac) { Write-Error "dacpac not found"; exit 1 }
-          echo "dacpac=$dacpac" >> $GITHUB_OUTPUT
+          $dacpac = (Get-ChildItem -Path "TaskFlowDB\bin\Release" -Filter *.dacpac -Recurse | Select-Object -First 1).FullName
+          if (-not $dacpac) { Write-Error "Dacpac not found in TaskFlowDB\bin\Release"; exit 1 }
+          "dacpac=$dacpac" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+          echo "Found dacpac at: $dacpac"
           echo "##[endgroup]"
-
-      - name: Azure Login (service principal)
-        uses: azure/login@v1
-        with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          client-secret: ${{ secrets.AZURE_CLIENT_SECRET }}
-
-      - name: Acquire Azure AD access token for Azure SQL
-        run: |
-          $token = az account get-access-token --resource https://database.windows.net/ --query accessToken -o tsv
-          if (-not $token) { Write-Error "Failed to acquire access token"; exit 1 }
-          echo "ACCESS_TOKEN=$token" >> $env:GITHUB_ENV
 
       - name: Install sqlpackage
         run: choco install -y sqlpackage
 
-      - name: Publish dacpac to Azure SQL (AAD)
+      - name: Publish dacpac to Azure SQL
         env:
           AZ_SQL_SERVER: ${{ secrets.AZURE_SQL_SERVER }}
           AZ_SQL_DB: ${{ secrets.AZURE_SQL_DATABASE }}
+          AZ_SQL_USER: ${{ secrets.AZURE_SQL_USER }}
+          AZ_SQL_PASSWORD: ${{ secrets.AZURE_SQL_PASSWORD }}
         run: |
           $dac = "${{ steps.find.outputs.dacpac }}"
           if (-not (Test-Path $dac)) { Write-Error "Dacpac not found: $dac"; exit 1 }
-          $access = $env:ACCESS_TOKEN
           sqlpackage /Action:Publish /SourceFile:$dac `
             /TargetServerName:"tcp:$env:AZ_SQL_SERVER.database.windows.net" `
             /TargetDatabaseName:$env:AZ_SQL_DB `
-            /TargetAccessToken:$access `
+            /TargetUser:$env:AZ_SQL_USER `
+            /TargetPassword:$env:AZ_SQL_PASSWORD `
             /p:AllowIncompatiblePlatform=True `
             /p:BlockOnPossibleDataLoss=False `
             /p:DropObjectsNotInSource=True

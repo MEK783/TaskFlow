@@ -9,18 +9,40 @@ using Microsoft.Extensions.Options;
 namespace TaskFlowAPI.Services
 {
     /// <summary>
-    /// Configuration for closed task cleanup
+    /// Configuration options for the closed task cleanup service.
+    /// Controls whether cleanup is enabled, how often it runs, and which tasks are eligible for deletion.
     /// </summary>
     public class ClosedTaskCleanupOptions
     {
+        /// <summary>
+        /// Gets or sets a value indicating whether the cleanup service is enabled.
+        /// Defaults to true. Set to false to disable automatic cleanup.
+        /// </summary>
         public bool Enabled { get; set; } = true;
-        public int IntervalDays { get; set; } = 7; // Run cleanup every 7 days
-        public int DeleteAfterDays { get; set; } = 30; // Delete tasks closed more than 30 days ago
-        public int BatchSize { get; set; } = 100; // Number of tasks to delete in each batch
+
+        /// <summary>
+        /// Gets or sets the interval in days between cleanup runs.
+        /// Defaults to 7 days. The service will execute cleanup this frequently.
+        /// </summary>
+        public int IntervalDays { get; set; } = 7;
+
+        /// <summary>
+        /// Gets or sets the number of days after closure before a task is eligible for deletion.
+        /// Defaults to 30 days. Only tasks closed more than this many days ago will be deleted.
+        /// </summary>
+        public int DeleteAfterDays { get; set; } = 30;
+
+        /// <summary>
+        /// Gets or sets the maximum number of tasks to delete in a single batch.
+        /// Defaults to 100. Smaller batch sizes reduce database load but increase cleanup duration.
+        /// </summary>
+        public int BatchSize { get; set; } = 100;
     }
 
     /// <summary>
-    /// Background service that periodically deletes old closed tasks
+    /// Background service that periodically deletes old closed tasks.
+    /// Runs as a hosted service in the application and executes cleanup on a configurable schedule.
+    /// This helps maintain database performance by removing obsolete task records.
     /// </summary>
     public class ClosedTaskCleanupService : BackgroundService
     {
@@ -29,6 +51,12 @@ namespace TaskFlowAPI.Services
         private readonly ClosedTaskCleanupOptions _options;
         private Timer? _timer;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ClosedTaskCleanupService"/> class.
+        /// </summary>
+        /// <param name="serviceProvider">Service provider for creating service scopes.</param>
+        /// <param name="logger">Logger instance for recording service activities.</param>
+        /// <param name="options">Configuration options for the cleanup service.</param>
         public ClosedTaskCleanupService(
             IServiceProvider serviceProvider,
             ILogger<ClosedTaskCleanupService> logger,
@@ -39,6 +67,10 @@ namespace TaskFlowAPI.Services
             _options = options.Value;
         }
 
+        /// <summary>
+        /// Executes the cleanup service startup and schedules recurring cleanup operations.
+        /// </summary>
+        /// <param name="stoppingToken">Cancellation token to stop the service.</param>
         protected override async System.Threading.Tasks.Task ExecuteAsync(CancellationToken stoppingToken)
         {
             if (!_options.Enabled)
@@ -62,6 +94,10 @@ namespace TaskFlowAPI.Services
                 TimeSpan.FromDays(_options.IntervalDays));
         }
 
+        /// <summary>
+        /// Performs the cleanup operation by deleting old closed tasks in batches.
+        /// </summary>
+        /// <param name="cancellationToken">Cancellation token to stop the cleanup operation.</param>
         private async System.Threading.Tasks.Task CleanupOldClosedTasksAsync(CancellationToken cancellationToken)
         {
             try
@@ -121,6 +157,10 @@ namespace TaskFlowAPI.Services
             }
         }
 
+        /// <summary>
+        /// Stops the background service and releases the timer resource.
+        /// </summary>
+        /// <param name="cancellationToken">Cancellation token for the stop operation.</param>
         public override async System.Threading.Tasks.Task StopAsync(CancellationToken cancellationToken)
         {
             _timer?.Dispose();
@@ -128,6 +168,9 @@ namespace TaskFlowAPI.Services
             await base.StopAsync(cancellationToken);
         }
 
+        /// <summary>
+        /// Disposes the service and releases the timer resource.
+        /// </summary>
         public override void Dispose()
         {
             _timer?.Dispose();

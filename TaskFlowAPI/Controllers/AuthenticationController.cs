@@ -5,6 +5,10 @@ using TaskFlowAPI.Models;
 
 namespace TaskFlowAPI.Controllers
 {
+    /// <summary>
+    /// Authentication controller for handling user registration, login, logout, and session management.
+    /// Manages refresh tokens via HTTP-only cookies for secure session handling.
+    /// </summary>
     [ApiController]
     [Route("api/v1.0/auth")]
     public class AuthenticationController : ControllerBase
@@ -19,6 +23,9 @@ namespace TaskFlowAPI.Controllers
         private const string RefreshTokenCookieName = "TaskFlowRefreshToken";
         private const string AccessTokenCookieName = "TaskFlowAccessToken";
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AuthenticationController"/> class.
+        /// </summary>
         public AuthenticationController(
             AuthenticationService authenticationService,
             UserService userService,
@@ -35,7 +42,20 @@ namespace TaskFlowAPI.Controllers
             _configuration = configuration;
         }
 
+        /// <summary>
+        /// Registers a new user with the system using an invite code.
+        /// The password should be the SHA512 hash from the frontend for double-hashing security.
+        /// </summary>
+        /// <param name="request">The registration request containing username, password hash, and invite code.</param>
+        /// <returns>
+        /// An HTTP 200 OK response with the created user details if successful,
+        /// or HTTP 400 Bad Request if validation fails or invite code is invalid.
+        /// </returns>
         [HttpPost("register")]
+        [Produces("application/json")]
+        [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> RegisterAsync([FromBody] RegisterRequest request)
         {
             try
@@ -72,7 +92,20 @@ namespace TaskFlowAPI.Controllers
             }
         }
 
+        /// <summary>
+        /// Authenticates a user and establishes a session via refresh token cookie.
+        /// The password should be the SHA512 hash from the frontend for double-hashing security.
+        /// </summary>
+        /// <param name="request">The login request containing username, password hash, and remember me preference.</param>
+        /// <returns>
+        /// An HTTP 200 OK response with the authenticated user details and refresh token cookie if successful,
+        /// or HTTP 401 Unauthorized if credentials are invalid.
+        /// </returns>
         [HttpPost("login")]
+        [Produces("application/json")]
+        [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> LoginAsync([FromBody] LoginRequest request)
         {
             try
@@ -132,7 +165,17 @@ namespace TaskFlowAPI.Controllers
             }
         }
 
+        /// <summary>
+        /// Logs out the current user by invalidating their refresh token and clearing cookies.
+        /// </summary>
+        /// <returns>
+        /// An HTTP 200 OK response indicating successful logout,
+        /// or HTTP 500 Internal Server Error if an unexpected error occurs.
+        /// </returns>
         [HttpPost("logout")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> LogoutAsync()
         {
             try
@@ -166,7 +209,20 @@ namespace TaskFlowAPI.Controllers
             }
         }
 
+        /// <summary>
+        /// Generates a new invite code for inviting new users to the system.
+        /// Requires an active authenticated session.
+        /// </summary>
+        /// <param name="request">The request containing the expiration days for the invite code.</param>
+        /// <returns>
+        /// An HTTP 200 OK response with the generated invite code if successful,
+        /// or HTTP 401 Unauthorized if the user is not authenticated.
+        /// </returns>
         [HttpPost("generate-invite")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GenerateInviteAsync([FromBody] GenerateInviteRequest request)
         {
             try
@@ -222,7 +278,19 @@ namespace TaskFlowAPI.Controllers
             }
         }
 
+        /// <summary>
+        /// Refreshes the authentication session using the current refresh token.
+        /// Returns updated user information without requiring login credentials again.
+        /// </summary>
+        /// <returns>
+        /// An HTTP 200 OK response with updated user information if successful,
+        /// or HTTP 401 Unauthorized if the refresh token is invalid or expired.
+        /// </returns>
         [HttpPost("refresh")]
+        [Produces("application/json")]
+        [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> RefreshTokenAsync()
         {
             try
@@ -262,6 +330,11 @@ namespace TaskFlowAPI.Controllers
             }
         }
 
+        /// <summary>
+        /// Maps a User entity to a UserDto for API responses.
+        /// </summary>
+        /// <param name="user">The user entity to map.</param>
+        /// <returns>A UserDto containing the mapped user information.</returns>
         private UserDto MapUserToDto(User user)
         {
             return new UserDto
@@ -274,6 +347,11 @@ namespace TaskFlowAPI.Controllers
             };
         }
 
+        /// <summary>
+        /// Maps an Invite entity to an InviteDto for API responses.
+        /// </summary>
+        /// <param name="invite">The invite entity to map.</param>
+        /// <returns>An InviteDto containing the mapped invite information.</returns>
         private InviteDto MapInviteToDto(Invite invite)
         {
             return new InviteDto

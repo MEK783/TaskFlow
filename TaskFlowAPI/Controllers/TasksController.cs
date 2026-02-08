@@ -5,6 +5,10 @@ using TaskFlowAPI.Models;
 
 namespace TaskFlowAPI.Controllers
 {
+    /// <summary>
+    /// Tasks controller for managing user tasks and their lifecycle.
+    /// All task operations require authentication via refresh token.
+    /// </summary>
     [ApiController]
     [Route("api/v1.0/tasks")]
     public class TasksController : ControllerBase
@@ -17,6 +21,9 @@ namespace TaskFlowAPI.Controllers
 
         private const string RefreshTokenCookieName = "TaskFlowRefreshToken";
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TasksController"/> class.
+        /// </summary>
         public TasksController(
             TaskService taskService,
             TaskStatusService taskStatusService,
@@ -32,8 +39,9 @@ namespace TaskFlowAPI.Controllers
         }
 
         /// <summary>
-        /// Gets the current user ID from the refresh token cookie
+        /// Gets the current authenticated user ID from the refresh token cookie.
         /// </summary>
+        /// <returns>The user ID if authenticated, or null if no valid refresh token is found.</returns>
         private async Task<int?> GetCurrentUserIdAsync()
         {
             if (!Request.Cookies.TryGetValue(RefreshTokenCookieName, out var refreshTokenValue))
@@ -50,7 +58,18 @@ namespace TaskFlowAPI.Controllers
             return refreshToken.UserId;
         }
 
+        /// <summary>
+        /// Retrieves all tasks for the currently authenticated user.
+        /// </summary>
+        /// <returns>
+        /// An HTTP 200 OK response containing a list of all user tasks,
+        /// or HTTP 401 Unauthorized if the user is not authenticated.
+        /// </returns>
         [HttpGet]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetAllTasksAsync()
         {
             try
@@ -78,7 +97,22 @@ namespace TaskFlowAPI.Controllers
             }
         }
 
+        /// <summary>
+        /// Retrieves a specific task by its ID.
+        /// Users can only retrieve their own tasks.
+        /// </summary>
+        /// <param name="id">The ID of the task to retrieve.</param>
+        /// <returns>
+        /// An HTTP 200 OK response containing the task details,
+        /// HTTP 404 Not Found if the task doesn't exist or belongs to another user,
+        /// or HTTP 401 Unauthorized if the user is not authenticated.
+        /// </returns>
         [HttpGet("{id}")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetTaskByIdAsync(int id)
         {
             try
@@ -109,7 +143,21 @@ namespace TaskFlowAPI.Controllers
             }
         }
 
+        /// <summary>
+        /// Retrieves all tasks for the authenticated user filtered by a specific status.
+        /// </summary>
+        /// <param name="statusId">The ID of the status to filter by.</param>
+        /// <returns>
+        /// An HTTP 200 OK response containing tasks with the specified status,
+        /// HTTP 400 Bad Request if the status ID is invalid,
+        /// or HTTP 401 Unauthorized if the user is not authenticated.
+        /// </returns>
         [HttpGet("status/{statusId}")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetTasksByStatusAsync(int statusId)
         {
             try
@@ -144,7 +192,22 @@ namespace TaskFlowAPI.Controllers
             }
         }
 
+        /// <summary>
+        /// Creates a new task for the authenticated user.
+        /// </summary>
+        /// <param name="request">The task creation request containing task name, description, and status.</param>
+        /// <returns>
+        /// An HTTP 201 Created response with the newly created task,
+        /// HTTP 400 Bad Request if the status ID is invalid or input is invalid,
+        /// or HTTP 401 Unauthorized if the user is not authenticated.
+        /// </returns>
         [HttpPost]
+        [Consumes("application/json")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> CreateTaskAsync([FromBody] CreateTaskRequest request)
         {
             try
@@ -199,7 +262,26 @@ namespace TaskFlowAPI.Controllers
             }
         }
 
+        /// <summary>
+        /// Updates an existing task.
+        /// Users can only update their own tasks.
+        /// </summary>
+        /// <param name="id">The ID of the task to update.</param>
+        /// <param name="request">The update request containing fields to modify.</param>
+        /// <returns>
+        /// An HTTP 200 OK response with the updated task,
+        /// HTTP 404 Not Found if the task doesn't exist or belongs to another user,
+        /// HTTP 400 Bad Request if the status ID is invalid,
+        /// or HTTP 401 Unauthorized if the user is not authenticated.
+        /// </returns>
         [HttpPut("{id}")]
+        [Consumes("application/json")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> UpdateTaskAsync(int id, [FromBody] UpdateTaskRequest request)
         {
             try
@@ -261,7 +343,22 @@ namespace TaskFlowAPI.Controllers
             }
         }
 
+        /// <summary>
+        /// Deletes an existing task.
+        /// Users can only delete their own tasks.
+        /// </summary>
+        /// <param name="id">The ID of the task to delete.</param>
+        /// <returns>
+        /// An HTTP 200 OK response confirming deletion,
+        /// HTTP 404 Not Found if the task doesn't exist or belongs to another user,
+        /// or HTTP 401 Unauthorized if the user is not authenticated.
+        /// </returns>
         [HttpDelete("{id}")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> DeleteTaskAsync(int id)
         {
             try
@@ -295,7 +392,22 @@ namespace TaskFlowAPI.Controllers
             }
         }
 
+        /// <summary>
+        /// Closes an existing task, marking it as complete.
+        /// Users can only close their own tasks.
+        /// </summary>
+        /// <param name="id">The ID of the task to close.</param>
+        /// <returns>
+        /// An HTTP 200 OK response with the closed task,
+        /// HTTP 404 Not Found if the task doesn't exist or belongs to another user,
+        /// or HTTP 401 Unauthorized if the user is not authenticated.
+        /// </returns>
         [HttpPatch("{id}/close")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> CloseTaskAsync(int id)
         {
             try
@@ -330,7 +442,22 @@ namespace TaskFlowAPI.Controllers
             }
         }
 
+        /// <summary>
+        /// Reopens a previously closed task.
+        /// Users can only reopen their own tasks.
+        /// </summary>
+        /// <param name="id">The ID of the task to reopen.</param>
+        /// <returns>
+        /// An HTTP 200 OK response with the reopened task,
+        /// HTTP 404 Not Found if the task doesn't exist or belongs to another user,
+        /// or HTTP 401 Unauthorized if the user is not authenticated.
+        /// </returns>
         [HttpPatch("{id}/reopen")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> ReopenTaskAsync(int id)
         {
             try
@@ -365,6 +492,11 @@ namespace TaskFlowAPI.Controllers
             }
         }
 
+        /// <summary>
+        /// Maps a UserTask entity to a TaskDto for API responses.
+        /// </summary>
+        /// <param name="task">The task entity to map.</param>
+        /// <returns>A TaskDto containing the mapped task information.</returns>
         private TaskDto MapTaskToDto(UserTask task)
         {
             return new TaskDto

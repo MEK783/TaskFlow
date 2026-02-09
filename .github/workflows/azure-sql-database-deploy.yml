@@ -17,9 +17,6 @@ jobs:
       - name: Setup MSBuild (Visual Studio)
         uses: microsoft/setup-msbuild@v1
 
-      - name: Restore NuGet packages
-        run: nuget restore TaskFlowDB/TaskFlowDB.sqlproj
-
       - name: Build SQL project (Release)
         run: msbuild /t:Build /p:Configuration=Release TaskFlowDB/TaskFlowDB.sqlproj
 
@@ -52,4 +49,4 @@ jobs:
             /TargetPassword:$env:AZ_SQL_PASSWORD `
             /p:AllowIncompatiblePlatform=True `
             /p:BlockOnPossibleDataLoss=False `
-            /p:DropObjectsNotInSource=True
+            /p:DropObjectsNotInSource=False

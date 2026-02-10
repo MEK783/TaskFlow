@@ -1,87 +1,100 @@
 using BLFramework.Data;
 using BLFramework.Services;
 using Microsoft.EntityFrameworkCore;
-using TaskFlowAPI.Services;
 using System.Reflection;
+using TaskFlowAPI.Services;
 
-var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-
-// Configure Swagger with XML documentation
-builder.Services.AddSwaggerGen(options =>
+/// <summary>
+/// Application entry point and host configuration for TaskFlow API.
+/// </summary>
+public class Program
 {
-    // Add XML documentation file
-    var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFilename);
-    if (File.Exists(xmlPath))
+    /// <summary>
+    /// Main entry point for the TaskFlow API application.
+    /// </summary>
+    /// <param name="args">Command-line arguments.</param>
+    public static void Main(string[] args)
     {
-        options.IncludeXmlComments(xmlPath);
-    }
+        var builder = WebApplication.CreateBuilder(args);
 
-    // Configure Swagger title and description
-    options.SwaggerDoc("v1.0", new Microsoft.OpenApi.Models.OpenApiInfo
-    {
-        Title = "TaskFlow API",
-        Version = "v1.0",
-        Description = "REST API for the TaskFlow task management application",
-        Contact = new Microsoft.OpenApi.Models.OpenApiContact
+        // Add services to the container.
+        builder.Services.AddControllers();
+        builder.Services.AddEndpointsApiExplorer();
+
+        // Configure Swagger with XML documentation
+        builder.Services.AddSwaggerGen(options =>
         {
-            Name = "Mark Farrugia",
-            Email = "mark.e.farrugia@gmail.com",
-            Url = new Uri("https://github.com/MEK783/TaskFlow")
-        }
-    });
-});
+            // Add XML documentation file
+            var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+            var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFilename);
+            if (File.Exists(xmlPath))
+            {
+                options.IncludeXmlComments(xmlPath);
+            }
 
-// Configure DbContext
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(connectionString));
+            // Configure Swagger title and description
+            options.SwaggerDoc("v1.0", new Microsoft.OpenApi.Models.OpenApiInfo
+            {
+                Title = "TaskFlow API",
+                Version = "v1.0",
+                Description = "REST API for the TaskFlow task management application",
+                Contact = new Microsoft.OpenApi.Models.OpenApiContact
+                {
+                    Name = "Mark Farrugia",
+                    Email = "mark.e.farrugia@gmail.com",
+                    Url = new Uri("https://github.com/MEK783/TaskFlow")
+                }
+            });
+        });
 
-// Register BL Services
-builder.Services.AddScoped<UserService>();
-builder.Services.AddScoped<TaskStatusService>();
-builder.Services.AddScoped<TaskService>();
-builder.Services.AddScoped<InviteService>();
-builder.Services.AddScoped<RefreshTokenService>();
-builder.Services.AddScoped<AuthenticationService>();
+        // Configure DbContext
+        var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+        builder.Services.AddDbContext<AppDbContext>(options =>
+            options.UseSqlServer(connectionString));
 
-// Add CORS if needed
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowAll", builder =>
-    {
-        builder.AllowAnyOrigin()
-               .AllowAnyMethod()
-               .AllowAnyHeader();
-    });
-});
+        // Register BL Services
+        builder.Services.AddScoped<UserService>();
+        builder.Services.AddScoped<TaskStatusService>();
+        builder.Services.AddScoped<TaskService>();
+        builder.Services.AddScoped<InviteService>();
+        builder.Services.AddScoped<RefreshTokenService>();
+        builder.Services.AddScoped<AuthenticationService>();
 
-// Configure closed task cleanup service
-builder.Services.Configure<ClosedTaskCleanupOptions>(
-    builder.Configuration.GetSection("ClosedTaskCleanup"));
-builder.Services.AddHostedService<ClosedTaskCleanupService>();
+        // Add CORS if needed
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("AllowAll", policyBuilder =>
+            {
+                policyBuilder.AllowAnyOrigin()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader();
+            });
+        });
 
-var app = builder.Build();
+        // Configure closed task cleanup service
+        builder.Services.Configure<ClosedTaskCleanupOptions>(
+            builder.Configuration.GetSection("ClosedTaskCleanup"));
+        builder.Services.AddHostedService<ClosedTaskCleanupService>();
 
-// Configure the HTTP request pipeline.
-app.UseSwagger();
-app.UseSwaggerUI(options =>
-{
-    // Make Swagger available at root
-    options.SwaggerEndpoint("/swagger/v1.0/swagger.json", "TaskFlow API v1.0");
-    options.RoutePrefix = string.Empty;
-});
+        var app = builder.Build();
 
-app.UseHttpsRedirection();
+        // Configure the HTTP request pipeline.
+        app.UseSwagger();
+        app.UseSwaggerUI(options =>
+        {
+            // Make Swagger available at root
+            options.SwaggerEndpoint("/swagger/v1.0/swagger.json", "TaskFlow API v1.0");
+            options.RoutePrefix = string.Empty;
+        });
 
-app.UseCors("AllowAll");
+        app.UseHttpsRedirection();
 
-app.UseAuthorization();
+        app.UseCors("AllowAll");
 
-app.MapControllers();
+        app.UseAuthorization();
 
-app.Run();
+        app.MapControllers();
+
+        app.Run();
+    }
+}

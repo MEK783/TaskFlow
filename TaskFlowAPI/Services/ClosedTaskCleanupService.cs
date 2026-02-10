@@ -27,6 +27,12 @@ namespace TaskFlowAPI.Services
         public int IntervalDays { get; set; } = 7;
 
         /// <summary>
+        /// Gets or sets the startup delay in seconds before the first cleanup run.
+        /// Defaults to 10 seconds to allow the application to finish startup.
+        /// </summary>
+        public int StartupDelaySeconds { get; set; } = 10;
+
+        /// <summary>
         /// Gets or sets the number of days after closure before a task is eligible for deletion.
         /// Defaults to 30 days. Only tasks closed more than this many days ago will be deleted.
         /// </summary>
@@ -83,7 +89,8 @@ namespace TaskFlowAPI.Services
                 _options.IntervalDays, _options.DeleteAfterDays);
 
             // Run immediately on startup after a small delay
-            await System.Threading.Tasks.Task.Delay(TimeSpan.FromSeconds(10), stoppingToken);
+            var startupDelay = TimeSpan.FromSeconds(Math.Max(0, _options.StartupDelaySeconds));
+            await System.Threading.Tasks.Task.Delay(startupDelay, stoppingToken);
             await CleanupOldClosedTasksAsync(stoppingToken);
 
             // Set up recurring cleanup

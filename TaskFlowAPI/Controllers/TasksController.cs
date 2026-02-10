@@ -248,7 +248,7 @@ namespace TaskFlowAPI.Controllers
 
                 _logger.LogInformation("Task {TaskId} created by user {UserId}", createdTask.Id, userId.Value);
 
-                return CreatedAtAction(nameof(GetTaskByIdAsync), new { id = createdTask.Id }, new
+                return CreatedAtAction(nameof(GetTaskByIdAsync).Replace("Async", string.Empty), new { id = createdTask.Id }, new
                 {
                     success = true,
                     message = "Task created successfully",

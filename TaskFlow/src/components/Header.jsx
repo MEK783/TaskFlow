@@ -2,6 +2,7 @@ import { useAuth } from "../state/AuthContext.jsx";
 import { FaGithub, FaLinkedin } from "react-icons/fa";
 import { MdLogout, MdHelpOutline } from "react-icons/md";
 import { LiaUserPlusSolid } from "react-icons/lia";
+import { SiSwagger } from "react-icons/si";
 import AppTitle from "./AppTitle.jsx";
 import ThemeToggle from "./ThemeToggle.jsx";
 
@@ -14,11 +15,14 @@ export default function Header() {
                 <div className="flex flex-col items-start gap-0.5 mt-2 mb-4">
                     <AppTitle />
                     <div className="flex items-center gap-3 mt-1 text-neutral-700 dark:text-neutral-300 ml-16">
-                        <a href="https://github.com/MEK783" target="_blank" rel="noopener noreferrer" className="p-2 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-700" aria-label="GitHub">
+                        <a href="https://github.com/MEK783/TaskFlow" target="_blank" rel="noopener noreferrer" className="p-2 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-700" aria-label="GitHub">
                         <FaGithub size={18} />
                         </a>
                         <a href="https://www.linkedin.com/in/mark-farrugia-37760b25/" target="_blank" rel="noopener noreferrer" className="p-2 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-700" aria-label="LinkedIn">
                         <FaLinkedin size={18} />
+                        </a>
+                        <a href="https://taskflowapi.azurewebsites.net/swagger/index.html" target="_blank" rel="noopener noreferrer" className="p-2 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-700" aria-label="API Documentation">
+                        <SiSwagger size={18} />
                         </a>
                     </div>
                 </div>

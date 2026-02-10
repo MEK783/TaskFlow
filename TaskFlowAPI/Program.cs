@@ -29,7 +29,9 @@ builder.Services.AddSwaggerGen(options =>
         Description = "REST API for the TaskFlow task management application",
         Contact = new Microsoft.OpenApi.Models.OpenApiContact
         {
-            Name = "TaskFlow Team"
+            Name = "Mark Farrugia",
+            Email = "mark.e.farrugia@gmail.com",
+            Url = new Uri("https://github.com/MEK783/TaskFlow")
         }
     });
 });

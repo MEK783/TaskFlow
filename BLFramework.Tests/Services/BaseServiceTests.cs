@@ -149,4 +149,161 @@ public class BaseServiceTests
         var persisted = await context.Users.FindAsync(userId);
         Assert.Null(persisted);
     }
+
+    [Fact]
+    public async Task UpdateAsync_ShouldUpdateDetachedEntity()
+    {
+        // Arrange
+        var context = CreateTestDbContext();
+        var logger = CreateMockLogger();
+        var service = new BaseService<User>(context, logger);
+
+        var user = new User { Username = "original", Password = "hash", IsActive = true };
+        context.Users.Add(user);
+        await context.SaveChangesAsync();
+
+        // Detach the entity from the context
+        context.Entry(user).State = EntityState.Detached;
+
+        // Act
+        user.Username = "updated-detached";
+        var result = await service.UpdateAsync(user);
+
+        // Assert
+        Assert.Equal("updated-detached", result.Username);
+        var persisted = await context.Users.FindAsync(user.Id);
+        Assert.NotNull(persisted);
+        Assert.Equal("updated-detached", persisted.Username);
+    }
+
+    [Fact]
+    public async Task GetAllAsync_ShouldThrowAndLogWhenDatabaseErrorOccurs()
+    {
+        // Arrange
+        var context = CreateTestDbContext();
+        var mockLogger = new Mock<ILogger<BaseService<User>>>();
+        var service = new BaseService<User>(context, mockLogger.Object);
+
+        // Dispose the context to simulate a database error
+        await context.DisposeAsync();
+
+        // Act & Assert
+        await Assert.ThrowsAsync<ObjectDisposedException>(async () => await service.GetAllAsync());
+        
+        // Verify that the error was logged
+        mockLogger.Verify(
+            x => x.Log(
+                LogLevel.Error,
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("Error retrieving all entities of type User")),
+                It.IsAny<ObjectDisposedException>(),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+            Times.Once);
+    }
+
+    [Fact]
+    public async Task GetByIdAsync_ShouldThrowAndLogWhenDatabaseErrorOccurs()
+    {
+        // Arrange
+        var context = CreateTestDbContext();
+        var mockLogger = new Mock<ILogger<BaseService<User>>>();
+        var service = new BaseService<User>(context, mockLogger.Object);
+
+        // Dispose the context to simulate a database error
+        await context.DisposeAsync();
+
+        // Act & Assert
+        await Assert.ThrowsAsync<ObjectDisposedException>(async () => await service.GetByIdAsync(1));
+        
+        // Verify that the error was logged
+        mockLogger.Verify(
+            x => x.Log(
+                LogLevel.Error,
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("Error retrieving entity of type User with ID 1")),
+                It.IsAny<ObjectDisposedException>(),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+            Times.Once);
+    }
+
+    [Fact]
+    public async Task AddAsync_ShouldThrowAndLogWhenDatabaseErrorOccurs()
+    {
+        // Arrange
+        var context = CreateTestDbContext();
+        var mockLogger = new Mock<ILogger<BaseService<User>>>();
+        var service = new BaseService<User>(context, mockLogger.Object);
+
+        var user = new User { Username = "testuser", Password = "hash", IsActive = true };
+
+        // Dispose the context to simulate a database error
+        await context.DisposeAsync();
+
+        // Act & Assert
+        await Assert.ThrowsAsync<ObjectDisposedException>(async () => await service.AddAsync(user));
+        
+        // Verify that the error was logged
+        mockLogger.Verify(
+            x => x.Log(
+                LogLevel.Error,
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("Error adding entity of type User")),
+                It.IsAny<ObjectDisposedException>(),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+            Times.Once);
+    }
+
+    [Fact]
+    public async Task UpdateAsync_ShouldThrowAndLogWhenDatabaseErrorOccurs()
+    {
+        // Arrange
+        var context = CreateTestDbContext();
+        var mockLogger = new Mock<ILogger<BaseService<User>>>();
+        var service = new BaseService<User>(context, mockLogger.Object);
+
+        var user = new User { Id = 1, Username = "testuser", Password = "hash", IsActive = true };
+
+        // Dispose the context to simulate a database error
+        await context.DisposeAsync();
+
+        // Act & Assert
+        await Assert.ThrowsAsync<ObjectDisposedException>(async () => await service.UpdateAsync(user));
+        
+        // Verify that the error was logged
+        mockLogger.Verify(
+            x => x.Log(
+                LogLevel.Error,
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("Error updating entity of type User")),
+                It.IsAny<ObjectDisposedException>(),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+            Times.Once);
+    }
+
+    [Fact]
+    public async Task DeleteAsync_ShouldThrowAndLogWhenDatabaseErrorOccurs()
+    {
+        // Arrange
+        var context = CreateTestDbContext();
+        var mockLogger = new Mock<ILogger<BaseService<User>>>();
+        var service = new BaseService<User>(context, mockLogger.Object);
+
+        var user = new User { Id = 1, Username = "testuser", Password = "hash", IsActive = true };
+
+        // Dispose the context to simulate a database error
+        await context.DisposeAsync();
+
+        // Act & Assert
+        await Assert.ThrowsAsync<ObjectDisposedException>(async () => await service.DeleteAsync(user));
+        
+        // Verify that the error was logged
+        mockLogger.Verify(
+            x => x.Log(
+                LogLevel.Error,
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("Error deleting entity of type User")),
+                It.IsAny<ObjectDisposedException>(),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+            Times.Once);
+    }
 }

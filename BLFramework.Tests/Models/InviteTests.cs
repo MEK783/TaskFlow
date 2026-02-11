@@ -163,4 +163,84 @@ public class InviteTests
         Assert.NotEqual(code2, code3);
         Assert.NotEqual(code1, code3);
     }
+
+    [Fact]
+    public void Invite_CreatedBy_ShouldSetAndGetNavigationProperty()
+    {
+        // Arrange
+        var invite = new Invite();
+        var creator = new User
+        {
+            Id = 1,
+            Username = "creator",
+            Password = "hashed",
+            IsActive = true,
+            CreatedAt = DateTime.UtcNow,
+            LastLogin = DateTime.UtcNow
+        };
+
+        // Act
+        invite.CreatedBy = creator;
+
+        // Assert
+        Assert.NotNull(invite.CreatedBy);
+        Assert.Equal(1, invite.CreatedBy.Id);
+        Assert.Equal("creator", invite.CreatedBy.Username);
+    }
+
+    [Fact]
+    public void Invite_UsedBy_ShouldSetAndGetNavigationProperty()
+    {
+        // Arrange
+        var invite = new Invite();
+        var user = new User
+        {
+            Id = 2,
+            Username = "user",
+            Password = "hashed",
+            IsActive = true,
+            CreatedAt = DateTime.UtcNow,
+            LastLogin = DateTime.UtcNow
+        };
+
+        // Act
+        invite.UsedBy = user;
+
+        // Assert
+        Assert.NotNull(invite.UsedBy);
+        Assert.Equal(2, invite.UsedBy.Id);
+        Assert.Equal("user", invite.UsedBy.Username);
+    }
+
+    [Fact]
+    public void Invite_CreatedBy_ShouldAllowNull()
+    {
+        // Arrange
+        var invite = new Invite
+        {
+            CreatedBy = new User { Id = 1, Username = "test", Password = "hash", IsActive = true, CreatedAt = DateTime.UtcNow, LastLogin = DateTime.UtcNow }
+        };
+
+        // Act
+        invite.CreatedBy = null;
+
+        // Assert
+        Assert.Null(invite.CreatedBy);
+    }
+
+    [Fact]
+    public void Invite_UsedBy_ShouldAllowNull()
+    {
+        // Arrange
+        var invite = new Invite
+        {
+            UsedBy = new User { Id = 1, Username = "test", Password = "hash", IsActive = true, CreatedAt = DateTime.UtcNow, LastLogin = DateTime.UtcNow }
+        };
+
+        // Act
+        invite.UsedBy = null;
+
+        // Assert
+        Assert.Null(invite.UsedBy);
+    }
 }

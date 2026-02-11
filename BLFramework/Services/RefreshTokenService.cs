@@ -25,7 +25,7 @@ namespace BLFramework.Services
 
         /// <summary>
         /// Retrieves a refresh token by its token string asynchronously.
-        /// Eager loads the related User navigation property.
+        /// Does not load the related User navigation property.
         /// </summary>
         /// <param name="token">The token string to search for.</param>
         /// <returns>The RefreshToken if found; otherwise, null.</returns>
@@ -40,9 +40,9 @@ namespace BLFramework.Services
                     throw new ArgumentException("Token cannot be null or empty", nameof(token));
                 }
 
-                // Query by token string and include the related user
+                // Query by token string without including the related user
+                // The User navigation property should be loaded separately if needed
                 return await _context.RefreshTokens
-                    .Include(rt => rt.User)
                     .FirstOrDefaultAsync(rt => rt.Token == token);
             }
             catch (Exception ex)
